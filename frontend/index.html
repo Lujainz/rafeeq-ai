@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>رفيق</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: #0f172a;
+      color: #f1f5f9;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #a78bfa;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: #94a3b8;
+      margin-bottom: 48px;
+    }
+
+    #mic-btn {
+      width: 140px;
+      height: 140px;
+      border-radius: 50%;
+      background: #4f46e5;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.4);
+    }
+
+    #mic-btn:hover { background: #4338ca; transform: scale(1.05); }
+
+    #mic-btn.recording {
+      background: #dc2626;
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.5); }
+      70%  { box-shadow: 0 0 0 20px rgba(220, 38, 38, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+    }
+
+    #mic-btn svg { width: 56px; height: 56px; fill: white; }
+
+    #status {
+      margin-top: 28px;
+      font-size: 1rem;
+      color: #94a3b8;
+      min-height: 24px;
+    }
+
+    .bubble-container {
+      width: 100%;
+      max-width: 520px;
+      margin-top: 36px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .bubble {
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 1.1rem;
+      line-height: 1.7;
+      max-width: 85%;
+    }
+
+    .bubble.user {
+      background: #1e293b;
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+      color: #e2e8f0;
+    }
+
+    .bubble.rafeeq {
+      background: #4f46e5;
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+      color: white;
+    }
+
+    #instruction {
+      margin-top: 20px;
+      font-size: 0.85rem;
+      color: #475569;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>رفيق</h1>
+  <p class="subtitle">مساعدك الصوتي الذكي</p>
+
+  <button id="mic-btn" title="اضغط واستمر للتحدث">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-1 
+               14.93V18H9v2h6v-2h-2v-2.07A7.001 7.001 0 0 0 19 11h-2a5 
+               5 0 0 1-10 0H5a7.001 7.001 0 0 0 6 6.93z"/>
+    </svg>
+  </button>
+
+  <p id="status">اضغط مع الاستمرار للتحدث</p>
+  <p id="instruction">أفلت الزر لإرسال رسالتك</p>
+
+  <div class="bubble-container" id="bubbles"></div>
+
+<script>
+  const userId = "user_" + Math.random().toString(36).substr(2, 9);
+  const ws = new WebSocket(`ws://localhost:8000/ws/${userId}`);
+  const micBtn = document.getElementById("mic-btn");
+  const status = document.getElementById("status");
+  const bubbles = document.getElementById("bubbles");
+
+  // ── Audio queue ──────────────────────────────────────────────
+  const audioQueue = [];
+  let isPlaying = false;
+
+  function enqueueAudio(blob) {
+    audioQueue.push(blob);
+    if (!isPlaying) playNext();
+  }
+
+  function playNext() {
+    if (audioQueue.length === 0) {
+      isPlaying = false;
+      status.textContent = "اضغط مع الاستمرار للتحدث";
+      return;
+    }
+    isPlaying = true;
+    const blob = audioQueue.shift();
+    const url = URL.createObjectURL(blob);
+    const audio = new Audio(url);
+    audio.play();
+    audio.onended = () => {
+      URL.revokeObjectURL(url);
+      playNext();  // play the next chunk when this one finishes
+    };
+    audio.onerror = () => {
+      URL.revokeObjectURL(url);
+      playNext();  // skip broken chunks and continue
+    };
+  }
+
+  // ── WebSocket ────────────────────────────────────────────────
+  ws.onopen = () => { status.textContent = "متصل — اضغط مع الاستمرار للتحدث"; };
+  ws.onclose = () => { status.textContent = "⚠️ انقطع الاتصال — أعد تحميل الصفحة"; };
+
+  ws.onmessage = async (event) => {
+    if (typeof event.data === "string") {
+      const msg = JSON.parse(event.data);
+      if (msg.type === "transcript") {
+        addBubble(msg.text, "user");
+        status.textContent = "رفيق يفكر...";
+      } else if (msg.type === "reply_chunk") {
+        if (msg.text) appendOrCreateBubble(msg.text, "rafeeq");
+        status.textContent = "رفيق يتحدث...";
+      } else if (msg.type === "error") {
+        status.textContent = msg.message;
+      }
+    } else {
+      // audio bytes — add to queue instead of playing immediately
+      const blob = new Blob([event.data], { type: "audio/wav" });      enqueueAudio(blob);
+    }
+  };
+
+  // ── Recording ────────────────────────────────────────────────
+  let mediaRecorder, audioChunks, stream;
+
+  micBtn.addEventListener("mousedown", startRecording);
+  micBtn.addEventListener("mouseup", stopRecording);
+  micBtn.addEventListener("touchstart", (e) => { e.preventDefault(); startRecording(); });
+  micBtn.addEventListener("touchend", (e) => { e.preventDefault(); stopRecording(); });
+
+  async function startRecording() {
+    // stop any playing audio when user starts speaking
+    audioQueue.length = 0;
+    isPlaying = false;
+    currentRafeeqBubble = null;
+
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+    mediaRecorder.start();
+    micBtn.classList.add("recording");
+    status.textContent = "🎤 جاري الاستماع...";
+  }
+
+  function stopRecording() {
+    if (!mediaRecorder || mediaRecorder.state === "inactive") return;
+    mediaRecorder.stop();
+    micBtn.classList.remove("recording");
+    status.textContent = "جاري الإرسال...";
+    mediaRecorder.onstop = () => {
+      const blob = new Blob(audioChunks, { type: "audio/wav" });
+      blob.arrayBuffer().then(buf => ws.send(buf));
+      stream.getTracks().forEach(t => t.stop());
+    };
+  }
+
+  // ── UI helpers ───────────────────────────────────────────────
+  let currentRafeeqBubble = null;
+
+  function addBubble(text, sender) {
+    const div = document.createElement("div");
+    div.className = `bubble ${sender}`;
+    div.textContent = text;
+    bubbles.appendChild(div);
+    div.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function appendOrCreateBubble(text, sender) {
+    if (sender === "rafeeq" && currentRafeeqBubble) {
+      currentRafeeqBubble.textContent += " " + text;
+    } else {
+      const div = document.createElement("div");
+      div.className = `bubble ${sender}`;
+      div.textContent = text;
+      bubbles.appendChild(div);
+      div.scrollIntoView({ behavior: "smooth" });
+      if (sender === "rafeeq") currentRafeeqBubble = div;
+    }
+  }
+</script>
+</body>
+</html>

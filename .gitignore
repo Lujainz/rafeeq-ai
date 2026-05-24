@@ -1,0 +1,33 @@
+# Python
+backend/venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Secrets
+.env
+*.env
+
+# Audio temp files
+*.wav
+*.webm
+*.mp3
+
+# Logs
+logs/
+*.log
+
+# Database
+*.db
+chroma_data/
+postgres_data/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/settings.json
+.idea/

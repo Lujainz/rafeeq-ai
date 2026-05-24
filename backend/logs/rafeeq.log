@@ -238,3 +238,19 @@
 بالعافية! إذا كان لديك أي سؤال، لا تتردد في سؤالي.
 2026-05-23 23:16:31,224 | INFO     | routers.voice — Client disconnected: user_pll4eqf92
 2026-05-23 23:35:32,976 | INFO     | main — رفيق server stopped
+2026-05-25 01:44:17,327 | INFO     | main — رفيق server started ✅
+2026-05-25 01:44:32,662 | INFO     | routers.voice — Client connected: user_4zu...
+2026-05-25 01:44:40,027 | INFO     | routers.voice — Audio received — 43766 bytes from user_4zu...
+2026-05-25 01:44:40,028 | INFO     | utils.audio — Audio saved — 43766 bytes
+2026-05-25 01:44:44,360 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+2026-05-25 01:44:44,410 | INFO     | services.stt — STT complete — 12 chars
+2026-05-25 01:44:46,123 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-25 01:44:48,768 | INFO     | services.tts — Azure TTS success — 70846 bytes, voice: ar-SA-HamedNeural
+2026-05-25 01:44:49,411 | INFO     | services.tts — Azure TTS success — 67246 bytes, voice: ar-SA-HamedNeural
+2026-05-25 01:44:50,032 | INFO     | services.tts — Azure TTS success — 86046 bytes, voice: ar-SA-HamedNeural
+2026-05-25 01:44:50,100 | INFO     | services.llm — LLM stream complete — 50 chars, 0 history turns
+2026-05-25 01:44:50,100 | INFO     | routers.voice — Turn complete — user_4zu...
+2026-05-25 01:47:16,028 | INFO     | routers.voice — Client disconnected: user_4zu...
+2026-05-25 01:47:16,391 | INFO     | routers.voice — Client connected: user_4zu...
+2026-05-25 01:55:43,210 | INFO     | routers.voice — Client disconnected: user_4zu...
+2026-05-25 01:55:43,315 | INFO     | main — رفيق server stopped

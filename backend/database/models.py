@@ -1,59 +1,30 @@
+# database/models.py — bottom section only, replace from engine down
+import os
 # database/models.py
 from datetime import datetime
 from sqlalchemy import Column, String, Text, DateTime, Integer, create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
-from config import DATABASE_URL
+from config import DATABASE_URL  # ← this line was missing
 
 Base = declarative_base()
-
-class User(Base):
-    """One row per unique user_id."""
-    __tablename__ = "users"
-
-    id          = Column(String(64), primary_key=True)   # the browser-generated user_id
-    created_at  = Column(DateTime, default=datetime.utcnow)
-    last_seen   = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-class ConversationTurn(Base):
-    """
-    One row per voice turn.
-    user_text and assistant_text are encrypted at rest.
-    Raw turns are deleted after 30 days — only summaries are kept long term.
-    """
-    __tablename__ = "conversation_turns"
-
-    id              = Column(Integer, primary_key=True, autoincrement=True)
-    user_id         = Column(String(64), nullable=False, index=True)
-    user_text       = Column(Text, nullable=False)       # encrypted
-    assistant_text  = Column(Text, nullable=False)       # encrypted
-    created_at      = Column(DateTime, default=datetime.utcnow)
-
-class MemoryFact(Base):
-    """
-    Extracted long-term facts about a user.
-    e.g. "user's son is named Ahmed", "user has knee pain"
-    Stored encrypted. Never deleted.
-    """
-    __tablename__ = "memory_facts"
-
-    id          = Column(Integer, primary_key=True, autoincrement=True)
-    user_id     = Column(String(64), nullable=False, index=True)
-    fact        = Column(Text, nullable=False)            # encrypted
-    category    = Column(String(64), nullable=True)       # "family", "health", "preference"
-    created_at  = Column(DateTime, default=datetime.utcnow)
-
-# ── Engine + session factory ───────────────────────────────────
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True,      # test connection before using it
-    pool_size=5,             # max 5 persistent connections
-    max_overflow=10          # up to 10 extra under heavy load
-)
+# Use SQLite locally, PostgreSQL in production
+# Automatically detected from DATABASE_URL in .env
+if DATABASE_URL.startswith("sqlite"):
+    engine = create_engine(
+        DATABASE_URL,
+        connect_args={"check_same_thread": False}  # needed for SQLite + FastAPI
+    )
+else:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10
+    )
 
 SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
 
 def get_db():
-    """FastAPI dependency — yields a DB session and closes it after the request."""
     db = SessionLocal()
     try:
         yield db
@@ -61,5 +32,4 @@ def get_db():
         db.close()
 
 def create_tables():
-    """Create all tables if they don't exist. Called on server startup."""
     Base.metadata.create_all(bind=engine)

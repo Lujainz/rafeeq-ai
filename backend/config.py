@@ -42,6 +42,10 @@ MAX_HISTORY_TURNS: int = 20
 
 # ── TTS ───────────────────────────────────────────────────────
 AZURE_TTS_VOICE: str = "ar-SA-ZariyahNeural"
+ELEVENLABS_API_KEY: str = os.getenv("ELEVENLABS_API_KEY", "")
+ELEVENLABS_VOICE_ID: str = os.getenv("ELEVENLABS_VOICE_ID", "")
+if not ELEVENLABS_API_KEY:
+    raise ValueError("ELEVENLABS_API_KEY is missing from .env")
 
 # ── STT ───────────────────────────────────────────────────────
 STT_MODEL: str = "whisper-1"

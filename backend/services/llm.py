@@ -6,23 +6,36 @@ from config import OPENAI_API_KEY, LLM_MODEL, SYSTEM_PROMPT
 logger = logging.getLogger(__name__)
 client = OpenAI(api_key=OPENAI_API_KEY)
 
-def _build_messages(user_text: str, history: list[dict], memories: list[str]) -> list[dict]:
+def _build_messages(
+    user_text : str,
+    history   : list[dict],
+    memories  : list[str],
+    facts     : list[dict] = None
+) -> list[dict]:
     """
     Build the full message list for the LLM.
 
     Structure:
         [system prompt]
-        [memory block]     ← injected if memories exist, invisible to user
+        [structured facts block]   ← name, health, family always injected
+        [vector memory block]      ← contextually relevant past memories
         [conversation history]
         [current user message]
     """
     messages = [{"role": "system", "content": SYSTEM_PROMPT}]
 
-    # inject memories as a system-level context block
+    # inject structured facts — always available personal info
+    if facts:
+        facts_block = (
+            "معلومات ثابتة تعرفها عن هذا المستخدم:\n"
+            + "\n".join(f"- [{f['category']}] {f['fact']}" for f in facts)
+        )
+        messages.append({"role": "system", "content": facts_block})
+
+    # inject vector memories — contextually relevant past exchanges
     if memories:
         memory_block = (
-            "فيما يلي معلومات مهمة تذكرتها عن هذا المستخدم من محادثات سابقة. "
-            "استخدمها بشكل طبيعي في ردودك دون الإشارة إلى أنك تقرأ من ملاحظات:\n\n"
+            "ذكريات ذات صلة بالموضوع الحالي:\n"
             + "\n".join(f"- {m}" for m in memories)
         )
         messages.append({"role": "system", "content": memory_block})
@@ -32,10 +45,14 @@ def _build_messages(user_text: str, history: list[dict], memories: list[str]) ->
     return messages
 
 
-def get_reply(user_text: str, history: list[dict], memories: list[str] = None) -> str:
-    """Non-streaming reply — kept for testing."""
+def get_reply(
+    user_text : str,
+    history   : list[dict],
+    memories  : list[str]       = None,
+    facts     : list[dict]      = None
+) -> str:
     try:
-        messages = _build_messages(user_text, history, memories or [])
+        messages = _build_messages(user_text, history, memories or [], facts)
         response = client.chat.completions.create(
             model=LLM_MODEL,
             messages=messages
@@ -48,16 +65,16 @@ def get_reply(user_text: str, history: list[dict], memories: list[str] = None) -
         raise
 
 
-def stream_reply_sentences(user_text: str, history: list[dict], memories: list[str] = None):
-    """
-    Stream GPT-4o and yield one complete sentence at a time.
-    Memories are injected silently — the user never sees them.
-    """
-    messages = _build_messages(user_text, history, memories or [])
-
+def stream_reply_sentences(
+    user_text : str,
+    history   : list[dict],
+    memories  : list[str]  = None,
+    facts     : list[dict] = None
+):
+    messages       = _build_messages(user_text, history, memories or [], facts)
     SENTENCE_ENDINGS = {".", "!", "?", "،", "؟", "!"}
-    buffer     = ""
-    full_reply = ""
+    buffer         = ""
+    full_reply     = ""
 
     try:
         stream = client.chat.completions.create(
@@ -94,7 +111,11 @@ def stream_reply_sentences(user_text: str, history: list[dict], memories: list[s
         else:
             yield "", True
 
-        logger.info(f"LLM stream complete — {len(full_reply)} chars, {len(memories or [])} memories injected")
+        logger.info(
+            f"LLM stream — {len(full_reply)} chars | "
+            f"{len(memories or [])} memories | "
+            f"{len(facts or [])} facts"
+        )
 
     except Exception as e:
         logger.error(f"LLM streaming failed: {e}")

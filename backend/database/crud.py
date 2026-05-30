@@ -119,3 +119,24 @@ def get_memory_facts(db: Session, user_id: str) -> list[str]:
     except Exception as e:
         logger.error(f"Failed to retrieve memory facts: {e}")
         return []
+    
+def get_facts_by_category(db: Session, user_id: str, categories: list[str] = None) -> list[dict]:
+    """
+    Retrieve decrypted memory facts for a user.
+    Optionally filter by category list e.g. ['name', 'health', 'family']
+    """
+    try:
+        query = db.query(MemoryFact).filter(MemoryFact.user_id == user_id)
+
+        if categories:
+            query = query.filter(MemoryFact.category.in_(categories))
+
+        facts = query.order_by(MemoryFact.created_at.asc()).all()
+
+        return [
+            {"category": f.category, "fact": decrypt(f.fact)}
+            for f in facts
+        ]
+    except Exception as e:
+        logger.error(f"Failed to retrieve facts for {user_id[:8]}...: {e}")
+        return []

@@ -2,14 +2,21 @@
 import re
 import logging
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 from database.models import get_db
-from database.crud import get_or_create_user, save_turn, get_recent_turns
+from database.crud import (
+    get_or_create_user,
+    save_turn,
+    get_recent_turns,
+    get_facts_by_category
+)
 from services.stt import transcribe_audio
 from services.llm import stream_reply_sentences
 from services.tts import synthesize_speech
 from services.vector_memory import store_memory, retrieve_memories
 from services.entity_extractor import extract_and_store
+from services.summarizer import should_summarize, summarize_session
 from utils.audio import save_bytes_as_webm, cleanup_file, MAX_AUDIO_BYTES
 
 logger = logging.getLogger(__name__)
@@ -23,17 +30,18 @@ ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
 ]
 
+# core facts always injected — name, health, family always matter
+ALWAYS_INJECT_CATEGORIES = ["name", "health", "family"]
+
 @router.websocket("/ws/{user_id}")
 async def voice_endpoint(websocket: WebSocket, user_id: str):
 
-    # validate origin
     origin = websocket.headers.get("origin", "")
     if origin and origin not in ALLOWED_ORIGINS:
         logger.warning(f"Rejected connection from origin: {origin}")
         await websocket.close(1008)
         return
 
-    # validate user_id
     if not USER_ID_PATTERN.match(user_id):
         logger.warning(f"Rejected invalid user_id: {user_id!r}")
         await websocket.close(1008)
@@ -51,7 +59,6 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
             audio_bytes = await websocket.receive_bytes()
 
             if len(audio_bytes) > MAX_AUDIO_BYTES:
-                logger.warning(f"Oversized payload from {user_id[:8]}...")
                 await websocket.send_json({"type": "error", "message": "الملف الصوتي كبير جداً"})
                 continue
 
@@ -68,22 +75,30 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
 
             await websocket.send_json({"type": "transcript", "text": transcript})
 
-            # ── retrieve relevant memories ────────────────────
-            # search ChromaDB for past memories related to what the user just said
+            # ── retrieve memories ─────────────────────────────
+            # 1. vector search — contextually relevant past turns
             memories = retrieve_memories(user_id, transcript)
 
-            # ── load recent conversation history from DB ───────
+            # 2. structured facts — name, health, family always present
+            facts = get_facts_by_category(
+                db, user_id,
+                categories=ALWAYS_INJECT_CATEGORIES
+            )
+
+            # ── load recent history ───────────────────────────
             history = get_recent_turns(db, user_id, limit=10)
 
-            # ── stream reply with memories injected ───────────
+            # ── stream reply ──────────────────────────────────
             full_reply = ""
-            for sentence, is_last in stream_reply_sentences(transcript, history, memories):
+            for sentence, is_last in stream_reply_sentences(
+                transcript, history, memories, facts
+            ):
                 if not sentence:
                     continue
                 full_reply += sentence + " "
                 await websocket.send_json({
-                    "type": "reply_chunk",
-                    "text": sentence,
+                    "type"   : "reply_chunk",
+                    "text"   : sentence,
                     "is_last": is_last
                 })
                 audio_out = synthesize_speech(sentence)
@@ -91,15 +106,16 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
 
             full_reply = full_reply.strip()
 
-            # save turn to SQLite
+            # ── save turn to SQLite ───────────────────────────
             save_turn(db, user_id, transcript, full_reply)
 
-            # store turn in ChromaDB
+            # ── get turn count ────────────────────────────────
             turn_count = db.execute(
-                __import__('sqlalchemy').text("SELECT COUNT(*) FROM conversation_turns WHERE user_id = :uid"),
+                text("SELECT COUNT(*) FROM conversation_turns WHERE user_id = :uid"),
                 {"uid": user_id}
             ).scalar()
 
+            # ── store turn in ChromaDB ────────────────────────
             memory_text = f"المستخدم قال: {transcript} | رفيق أجاب: {full_reply}"
             store_memory(
                 user_id   = user_id,
@@ -108,7 +124,7 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
                 metadata  = {"type": "turn"}
             )
 
-            # extract personal facts from this turn
+            # ── extract personal facts ────────────────────────
             extract_and_store(
                 user_id    = user_id,
                 transcript = transcript,
@@ -117,7 +133,12 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
                 turn_index = turn_count
             )
 
-            logger.info(f"Turn complete — {user_id[:8]}...")
+            # ── summarize if threshold hit ────────────────────
+            if should_summarize(turn_count):
+                logger.info(f"Summarizing session at turn {turn_count} for {user_id[:8]}...")
+                summarize_session(user_id, db, turn_count)
+
+            logger.info(f"Turn {turn_count} complete — {user_id[:8]}...")
 
     except WebSocketDisconnect:
         logger.info(f"Client disconnected: {user_id[:8]}...")

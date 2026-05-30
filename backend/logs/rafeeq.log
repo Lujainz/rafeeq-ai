@@ -710,3 +710,125 @@
 2026-05-29 02:27:40,284 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 2026-05-29 02:27:40,354 | INFO     | routers.voice — Client disconnected: user_4zu...
 2026-05-29 02:27:40,679 | INFO     | main — رفيق server stopped
+2026-05-30 22:28:12,700 | INFO     | watchfiles.main — 4 changes detected
+2026-05-30 22:28:13,932 | INFO     | main — رفيق server started ✅
+2026-05-30 22:28:30,195 | INFO     | routers.voice — Client connected: user_4zu...
+2026-05-30 22:28:30,369 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:30:10,913 | INFO     | utils.audio — Audio saved — 133604 bytes
+2026-05-30 22:30:29,091 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+2026-05-30 22:30:29,144 | INFO     | services.stt — STT complete — 41 chars
+2026-05-30 22:30:30,179 | INFO     | watchfiles.main — 4 changes detected
+2026-05-30 22:30:33,135 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:30:33,292 | INFO     | services.vector_memory — Retrieved 5 memories for user_4zu...
+2026-05-30 22:30:34,719 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:30:37,568 | INFO     | services.tts — TTS success — 37728 bytes
+2026-05-30 22:30:38,815 | INFO     | services.tts — TTS success — 45216 bytes
+2026-05-30 22:30:39,533 | INFO     | services.tts — TTS success — 53856 bytes
+2026-05-30 22:30:40,128 | INFO     | services.tts — TTS success — 40608 bytes
+2026-05-30 22:30:40,226 | INFO     | services.llm — LLM stream — 121 chars | 5 memories | 0 facts
+2026-05-30 22:30:40,292 | INFO     | database.crud — Turn saved for user_4zu...
+2026-05-30 22:30:40,382 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:30:40,742 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:30:40,895 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:30:40,970 | INFO     | services.vector_memory — Memory stored — user_4zu... | id: turn_user_4zu_7
+2026-05-30 22:30:41,256 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:30:41,933 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:30:41,965 | WARNING  | services.entity_extractor — Entity extractor returned invalid JSON: ```json
+{
+  "facts": [
+    {"category": "name", "fact": "اسم المستخدم هو محمد"},
+    {"category": "f
+2026-05-30 22:30:41,966 | INFO     | routers.voice — Turn 7 complete — user_4zu...
+2026-05-30 22:31:34,663 | INFO     | utils.audio — Audio saved — 107522 bytes
+2026-05-30 22:31:36,468 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+2026-05-30 22:31:36,472 | INFO     | services.stt — STT complete — 34 chars
+2026-05-30 22:31:36,933 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:31:36,952 | INFO     | services.vector_memory — Retrieved 5 memories for user_4zu...
+2026-05-30 22:31:37,889 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:31:38,817 | INFO     | services.tts — TTS success — 53856 bytes
+2026-05-30 22:31:40,964 | INFO     | services.tts — TTS success — 104544 bytes
+2026-05-30 22:31:41,680 | INFO     | services.tts — TTS success — 46656 bytes
+2026-05-30 22:31:42,441 | INFO     | services.tts — TTS success — 34560 bytes
+2026-05-30 22:31:43,070 | INFO     | services.tts — TTS success — 47232 bytes
+2026-05-30 22:31:43,559 | INFO     | services.tts — TTS success — 22176 bytes
+2026-05-30 22:31:43,633 | INFO     | services.llm — LLM stream — 202 chars | 5 memories | 0 facts
+2026-05-30 22:31:43,648 | INFO     | database.crud — Turn saved for user_4zu...
+2026-05-30 22:31:43,748 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:31:44,044 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:31:44,115 | INFO     | services.vector_memory — Memory stored — user_4zu... | id: turn_user_4zu_8
+2026-05-30 22:31:44,166 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:31:45,874 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:31:45,878 | INFO     | services.entity_extractor — No entities found in turn 8 for user_4zu...
+2026-05-30 22:31:45,879 | INFO     | routers.voice — Turn 8 complete — user_4zu...
+2026-05-30 22:34:09,274 | INFO     | utils.audio — Audio saved — 38936 bytes
+2026-05-30 22:34:23,585 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+2026-05-30 22:34:23,588 | INFO     | services.stt — STT complete — 12 chars
+2026-05-30 22:34:24,615 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:34:24,631 | INFO     | services.vector_memory — Retrieved 5 memories for user_4zu...
+2026-05-30 22:34:25,208 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:34:26,019 | INFO     | services.tts — TTS success — 29088 bytes
+2026-05-30 22:34:26,954 | INFO     | services.tts — TTS success — 66240 bytes
+2026-05-30 22:34:27,035 | INFO     | services.llm — LLM stream — 56 chars | 5 memories | 0 facts
+2026-05-30 22:34:27,052 | INFO     | database.crud — Turn saved for user_4zu...
+2026-05-30 22:34:27,135 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:34:27,477 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:34:27,523 | INFO     | services.vector_memory — Memory stored — user_4zu... | id: turn_user_4zu_9
+2026-05-30 22:34:27,549 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:34:28,501 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:34:28,503 | INFO     | services.entity_extractor — No entities found in turn 9 for user_4zu...
+2026-05-30 22:34:28,504 | INFO     | routers.voice — Turn 9 complete — user_4zu...
+2026-05-30 22:35:25,999 | INFO     | routers.voice — Client disconnected: user_4zu...
+2026-05-30 22:35:28,821 | INFO     | routers.voice — Client connected: user_4zu...
+2026-05-30 22:35:28,908 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:35:38,327 | INFO     | utils.audio — Audio saved — 57290 bytes
+2026-05-30 22:35:39,670 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+2026-05-30 22:35:39,674 | INFO     | services.stt — STT complete — 22 chars
+2026-05-30 22:35:40,181 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:35:40,190 | INFO     | services.vector_memory — Retrieved 5 memories for user_4zu...
+2026-05-30 22:35:41,308 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:35:41,913 | INFO     | services.tts — TTS success — 40320 bytes
+2026-05-30 22:35:42,688 | INFO     | services.tts — TTS success — 25632 bytes
+2026-05-30 22:35:43,293 | INFO     | services.tts — TTS success — 41760 bytes
+2026-05-30 22:35:44,069 | INFO     | services.tts — TTS success — 60480 bytes
+2026-05-30 22:35:44,592 | INFO     | services.tts — TTS success — 36288 bytes
+2026-05-30 22:35:44,672 | INFO     | services.llm — LLM stream — 129 chars | 5 memories | 0 facts
+2026-05-30 22:35:44,691 | INFO     | database.crud — Turn saved for user_4zu...
+2026-05-30 22:35:44,771 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:35:44,948 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:35:44,996 | INFO     | services.vector_memory — Memory stored — user_4zu... | id: turn_user_4zu_10
+2026-05-30 22:35:45,125 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:35:46,485 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:35:46,490 | INFO     | services.entity_extractor — No entities found in turn 10 for user_4zu...
+2026-05-30 22:35:46,491 | INFO     | routers.voice — Summarizing session at turn 10 for user_4zu...
+2026-05-30 22:35:48,064 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:35:48,065 | INFO     | services.summarizer — Session summary generated — 340 chars for user_4zu...
+2026-05-30 22:35:48,299 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:35:48,357 | INFO     | services.vector_memory — Memory stored — user_4zu... | id: summary_user_4zu_10
+2026-05-30 22:35:48,375 | INFO     | database.crud — Memory fact saved for user_4zu... [session_summary]
+2026-05-30 22:35:48,440 | INFO     | services.summarizer — Deleted 10 raw turns after summarization for user_4zu...
+2026-05-30 22:35:48,440 | INFO     | routers.voice — Turn 10 complete — user_4zu...
+2026-05-30 22:35:48,456 | INFO     | watchfiles.main — 6 changes detected
+2026-05-30 22:36:15,833 | INFO     | utils.audio — Audio saved — 46664 bytes
+2026-05-30 22:36:20,015 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+2026-05-30 22:36:20,017 | INFO     | services.stt — STT complete — 17 chars
+2026-05-30 22:36:20,363 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:36:20,372 | INFO     | services.vector_memory — Retrieved 5 memories for user_4zu...
+2026-05-30 22:36:21,345 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:36:22,213 | INFO     | services.tts — TTS success — 55296 bytes
+2026-05-30 22:36:22,876 | INFO     | services.tts — TTS success — 42624 bytes
+2026-05-30 22:36:22,956 | INFO     | services.llm — LLM stream — 50 chars | 5 memories | 0 facts
+2026-05-30 22:36:22,972 | INFO     | database.crud — Turn saved for user_4zu...
+2026-05-30 22:36:23,026 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:36:23,381 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:36:23,459 | INFO     | services.vector_memory — Memory stored — user_4zu... | id: turn_user_4zu_1
+2026-05-30 22:36:23,492 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:36:25,282 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-05-30 22:36:25,304 | INFO     | database.crud — Memory fact saved for user_4zu... [name]
+2026-05-30 22:36:25,371 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:36:25,535 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-05-30 22:36:25,644 | INFO     | services.vector_memory — Memory stored — user_4zu... | id: fact_user_4zu_1_0
+2026-05-30 22:36:25,645 | INFO     | services.entity_extractor — Extracted 1 facts from turn 1 for user_4zu...
+2026-05-30 22:36:25,646 | INFO     | routers.voice — Turn 1 complete — user_4zu...
+2026-05-30 22:36:25,734 | INFO     | watchfiles.main — 3 changes detected
+2026-05-30 22:36:35,085 | INFO     | routers.voice — Client disconnected: user_4zu...
+2026-05-30 22:36:37,679 | INFO     | main — رفيق server stopped

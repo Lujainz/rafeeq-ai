@@ -3,7 +3,7 @@ import logging
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
-from config import OPENAI_API_KEY, CHROMA_HOST, CHROMA_PORT
+from config import OPENAI_API_KEY, CHROMA_DATA_PATH
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +14,7 @@ _openai = OpenAI(api_key=OPENAI_API_KEY)
 
 # ChromaDB running locally — persistent on disk
 _chroma = chromadb.PersistentClient(
-    path="E:/rafeeq/backend/chroma_data",
+    path=CHROMA_DATA_PATH,
     settings=Settings(anonymized_telemetry=False)
 )
 

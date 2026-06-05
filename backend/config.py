@@ -23,6 +23,7 @@ if not DATABASE_URL:
 # ── ChromaDB ──────────────────────────────────────────────────
 CHROMA_HOST: str = os.getenv("CHROMA_HOST", "localhost")
 CHROMA_PORT: int = int(os.getenv("CHROMA_PORT", "8001"))
+CHROMA_DATA_PATH: str = os.getenv("CHROMA_DATA_PATH", "./chroma_data")
 
 # ── Encryption ────────────────────────────────────────────────
 ENCRYPTION_KEY: str = os.getenv("ENCRYPTION_KEY", "")

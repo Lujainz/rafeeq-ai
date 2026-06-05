@@ -17,7 +17,7 @@ Speak naturally in Arabic — رفيق listens, understands, and responds with a
 | STT | OpenAI Whisper |
 | LLM | GPT-4o |
 | TTS | Azure Cognitive Services (ar-SA) |
-| Memory | PostgreSQL + ChromaDB |
+| Memory | SQLite + ChromaDB |
 | Frontend | HTML / CSS / Vanilla JS |
 
 ## Running locally
@@ -30,4 +30,5 @@ Speak naturally in Arabic — رفيق listens, understands, and responds with a
 
 ## Project status
 Phase 1 complete — voice pipeline running.
-Phase 2 in progress — persistent memory system.
+Phase 2 complete — memory system.
+Phase 3 in progress - frontend redesign.

@@ -1,6 +1,7 @@
 # routers/voice.py
 import re
 import logging
+import asyncio
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from sqlalchemy.orm import Session
 from database.models import SessionLocal
@@ -65,7 +66,9 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
             # ── transcribe ────────────────────────────────────
             audio_path = save_bytes_as_webm(audio_bytes)
             try:
-                transcript = transcribe_audio(audio_path)
+                transcript = await asyncio.get_event_loop().run_in_executor(
+                 None, transcribe_audio, audio_path
+                )
             finally:
                 cleanup_file(audio_path)
 
@@ -77,7 +80,9 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
 
             # ── retrieve memories ─────────────────────────────
             # 1. vector search — contextually relevant past turns
-            memories = retrieve_memories(user_id, transcript)
+            memories = await asyncio.get_event_loop().run_in_executor(
+            None, retrieve_memories, user_id, transcript
+          )
 
             # 2. structured facts — name, health, family always present
             facts = get_facts_by_category(
@@ -101,7 +106,9 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
                     "text"   : sentence,
                     "is_last": is_last
                 })
-                audio_out = synthesize_speech(sentence)
+                audio_out = await asyncio.get_event_loop().run_in_executor(
+                None, synthesize_speech, sentence
+                )
                 await websocket.send_bytes(audio_out)
 
             full_reply = full_reply.strip()
@@ -122,18 +129,24 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
             )
 
             # ── extract personal facts ────────────────────────
-            extract_and_store(
-                user_id    = user_id,
-                transcript = transcript,
-                reply      = full_reply,
-                db         = db,
-                turn_index = turn_count
+            await asyncio.get_event_loop().run_in_executor(
+             None,
+             lambda: extract_and_store(
+                 user_id    = user_id,
+                 transcript = transcript,
+                 reply      = full_reply,
+                 db         = db,
+                 turn_index = turn_count
+             )
             )
 
             # ── summarize if threshold hit ────────────────────
             if should_summarize(turn_count):
                 logger.info(f"Summarizing session at turn {turn_count} for {user_id[:8]}...")
-                summarize_session(user_id, db, turn_count)
+                await asyncio.get_event_loop().run_in_executor(
+                 None,
+                 lambda: summarize_session(user_id, db, turn_count)
+               )
 
             logger.info(f"Turn {turn_count} complete — {user_id[:8]}...")
 

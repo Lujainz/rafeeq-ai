@@ -832,3 +832,29 @@
 2026-05-30 22:36:25,734 | INFO     | watchfiles.main — 3 changes detected
 2026-05-30 22:36:35,085 | INFO     | routers.voice — Client disconnected: user_4zu...
 2026-05-30 22:36:37,679 | INFO     | main — رفيق server stopped
+2026-06-07 02:14:19,911 | INFO     | watchfiles.main — 4 changes detected
+2026-06-07 02:14:20,861 | INFO     | main — رفيق server started ✅
+2026-06-07 02:14:32,002 | INFO     | routers.voice — Client connected: user_pg8...
+2026-06-07 02:14:32,129 | INFO     | watchfiles.main — 3 changes detected
+2026-06-07 02:14:45,532 | INFO     | utils.audio — Audio saved — 42800 bytes
+2026-06-07 02:14:50,166 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/audio/transcriptions "HTTP/1.1 200 OK"
+2026-06-07 02:14:50,227 | INFO     | services.stt — STT complete — 12 chars
+2026-06-07 02:14:51,202 | INFO     | watchfiles.main — 4 changes detected
+2026-06-07 02:14:53,621 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-07 02:14:53,732 | INFO     | services.vector_memory — Retrieved 5 memories for user_pg8...
+2026-06-07 02:14:55,293 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-07 02:14:57,895 | INFO     | services.tts — TTS success — 40320 bytes
+2026-06-07 02:14:58,621 | INFO     | services.tts — TTS success — 29664 bytes
+2026-06-07 02:14:59,183 | INFO     | services.tts — TTS success — 37440 bytes
+2026-06-07 02:14:59,269 | INFO     | services.llm — LLM stream — 64 chars | 5 memories | 2 facts
+2026-06-07 02:14:59,311 | INFO     | database.crud — Turn saved for user_pg8...
+2026-06-07 02:14:59,386 | INFO     | watchfiles.main — 3 changes detected
+2026-06-07 02:15:03,438 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/embeddings "HTTP/1.1 200 OK"
+2026-06-07 02:15:03,624 | INFO     | watchfiles.main — 3 changes detected
+2026-06-07 02:15:03,650 | INFO     | services.vector_memory — Memory stored — user_pg8... | id: turn_user_pg8_7
+2026-06-07 02:15:03,983 | INFO     | watchfiles.main — 3 changes detected
+2026-06-07 02:15:04,219 | INFO     | httpx — HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2026-06-07 02:15:04,243 | INFO     | services.entity_extractor — No entities found in turn 7 for user_pg8...
+2026-06-07 02:15:04,244 | INFO     | routers.voice — Turn 7 complete — user_pg8...
+2026-06-07 02:19:26,345 | INFO     | routers.voice — Client disconnected: user_pg8...
+2026-06-07 02:19:26,452 | INFO     | main — رفيق server stopped

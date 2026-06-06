@@ -1,7 +1,8 @@
 # main.py
 import logging
 import os
-from fastapi import FastAPI, Request
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -24,10 +25,26 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+# ── Lifespan — replaces deprecated @app.on_event ──────────────
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # startup
+    create_tables()
+    logger.info("رفيق server started ✅")
+    yield
+    # shutdown
+    logger.info("رفيق server stopped")
+
 # ── Rate limiter ───────────────────────────────────────────────
 limiter = Limiter(key_func=get_remote_address, default_limits=["60/minute"])
 
-app = FastAPI(title="Rafeeq — رفيق", version="0.1.0")
+# ── App ────────────────────────────────────────────────────────
+app = FastAPI(
+    title="Rafeeq — رفيق",
+    version="0.1.0",
+    lifespan=lifespan
+)
+
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -56,12 +73,3 @@ async def root():
 @app.get("/health")
 async def health():
     return JSONResponse({"status": "ok", "service": "rafeeq"})
-
-@app.on_event("startup")
-async def startup():
-    create_tables()   # create DB tables if they don't exist
-    logger.info("رفيق server started ✅")
-
-@app.on_event("shutdown")
-async def shutdown():
-    logger.info("رفيق server stopped")

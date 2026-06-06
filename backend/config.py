@@ -39,7 +39,6 @@ SAMPLE_RATE: int = 16000
 
 # ── LLM ───────────────────────────────────────────────────────
 LLM_MODEL: str = "gpt-4o"
-MAX_HISTORY_TURNS: int = 20
 
 # ── TTS ───────────────────────────────────────────────────────
 AZURE_TTS_VOICE: str = "ar-SA-ZariyahNeural"
@@ -51,6 +50,10 @@ if not ELEVENLABS_API_KEY:
 # ── STT ───────────────────────────────────────────────────────
 STT_MODEL: str = "whisper-1"
 STT_LANGUAGE: str = "ar"
+
+# ── Memory ────────────────────────────────────────────────────
+SUMMARIZE_EVERY: int = int(os.getenv("SUMMARIZE_EVERY", "10"))
+MAX_HISTORY_TURNS: int = 20
 
 # ── System prompt ─────────────────────────────────────────────
 SYSTEM_PROMPT: str = (

@@ -2,7 +2,7 @@
 import logging
 from openai import OpenAI
 from sqlalchemy.orm import Session
-from config import OPENAI_API_KEY, LLM_MODEL
+from config import OPENAI_API_KEY, LLM_MODEL, SUMMARIZE_EVERY
 from database.models import ConversationTurn
 from database.crud import get_recent_turns, save_memory_fact
 from services.vector_memory import store_memory

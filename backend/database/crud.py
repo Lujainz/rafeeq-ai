@@ -140,3 +140,14 @@ def get_facts_by_category(db: Session, user_id: str, categories: list[str] = Non
     except Exception as e:
         logger.error(f"Failed to retrieve facts for {user_id[:8]}...: {e}")
         return []
+    
+def get_turn_count(db: Session, user_id: str) -> int:
+    """Return the total number of saved turns for a user."""
+    try:
+        count = db.query(ConversationTurn)\
+                  .filter(ConversationTurn.user_id == user_id)\
+                  .count()
+        return count
+    except Exception as e:
+        logger.error(f"Failed to get turn count for {user_id[:8]}...: {e}")
+        return 0

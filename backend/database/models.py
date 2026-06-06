@@ -1,7 +1,7 @@
 # database/models.py
 from datetime import datetime
 from sqlalchemy import Column, String, Text, DateTime, Integer, create_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base, sessionmaker, Session
 from config import DATABASE_URL
 
 Base = declarative_base()
@@ -59,7 +59,7 @@ else:
         max_overflow=10
     )
 
-SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False)
+SessionLocal = sessionmaker(bind=engine, autocommit=False, autoflush=False, class_=Session)
 
 def get_db():
     """Yields a DB session and closes it after use."""

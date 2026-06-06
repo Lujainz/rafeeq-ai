@@ -2,14 +2,14 @@
 import re
 import logging
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
-from sqlalchemy import text
 from sqlalchemy.orm import Session
-from database.models import get_db
+from database.models import SessionLocal
 from database.crud import (
     get_or_create_user,
     save_turn,
     get_recent_turns,
-    get_facts_by_category
+    get_facts_by_category,
+    get_turn_count
 )
 from services.stt import transcribe_audio
 from services.llm import stream_reply_sentences
@@ -50,9 +50,9 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
     await websocket.accept()
     logger.info(f"Client connected: {user_id[:8]}...")
 
-    db: Session = next(get_db())
-
-    try:
+    with SessionLocal() as db:
+    
+     try:
         get_or_create_user(db, user_id)
 
         while True:
@@ -110,10 +110,7 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
             save_turn(db, user_id, transcript, full_reply)
 
             # ── get turn count ────────────────────────────────
-            turn_count = db.execute(
-                text("SELECT COUNT(*) FROM conversation_turns WHERE user_id = :uid"),
-                {"uid": user_id}
-            ).scalar()
+            turn_count = get_turn_count(db, user_id)
 
             # ── store turn in ChromaDB ────────────────────────
             memory_text = f"المستخدم قال: {transcript} | رفيق أجاب: {full_reply}"
@@ -140,13 +137,11 @@ async def voice_endpoint(websocket: WebSocket, user_id: str):
 
             logger.info(f"Turn {turn_count} complete — {user_id[:8]}...")
 
-    except WebSocketDisconnect:
+     except WebSocketDisconnect:
         logger.info(f"Client disconnected: {user_id[:8]}...")
-    except Exception as e:
+     except Exception as e:
         logger.error(f"Unexpected error for {user_id[:8]}...: {e}")
         try:
             await websocket.send_json({"type": "error", "message": "حدث خطأ، يرجى المحاولة مرة أخرى"})
         except Exception:
             pass
-    finally:
-        db.close()

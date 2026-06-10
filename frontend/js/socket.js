@@ -1,4 +1,4 @@
-// socket.js — WebSocket connection, reconnect logic, and message handling
+// socket.js
 const Socket = (() => {
   let ws;
   let reconnectAttempts = 0;
@@ -10,8 +10,8 @@ const Socket = (() => {
 
     ws.onopen = () => {
       reconnectAttempts = 0;
-      UI.setMicEnabled(true);
-      UI.setStatus('متصل — اضغط مع الاستمرار للتحدث');
+      UI.setIdle();
+      UI.setStatus('اضغط مع الاستمرار للتحدث');
     };
 
     ws.onclose = () => {
@@ -22,7 +22,7 @@ const Socket = (() => {
         UI.setStatus(`جاري إعادة الاتصال... (${reconnectAttempts}/${CONFIG.maxReconnects})`);
         setTimeout(connect, wait * 1000);
       } else {
-        UI.setStatus('⚠️ تعذر الاتصال — أعد تحميل الصفحة');
+        UI.setStatus('تعذر الاتصال — أعد تحميل الصفحة');
       }
     };
 
@@ -33,18 +33,31 @@ const Socket = (() => {
     ws.onmessage = (event) => {
       if (typeof event.data === 'string') {
         const msg = JSON.parse(event.data);
+
         if (msg.type === 'transcript') {
           UI.addUserBubble(msg.text);
+          UI.setThinking();                         // ← show thinking dots
           UI.setStatus('رفيق يفكر...');
+
         } else if (msg.type === 'reply_chunk') {
-          if (msg.text) UI.appendRafeeqChunk(msg.text);
-          UI.setStatus('رفيق يتحدث...');
+          if (msg.text) {
+            UI.setSpeaking();                       // ← first chunk: switch to speaking
+            UI.appendRafeeqChunk(msg.text);
+          }
+          if (msg.is_last) {
+            UI.setStatus('اضغط مع الاستمرار للتحدث');
+          } else {
+            UI.setStatus('رفيق يتحدث...');
+          }
+
         } else if (msg.type === 'error') {
+          UI.setIdle();
           UI.setStatus(msg.message);
         }
+
       } else {
         // audio bytes
-        const blob = new Blob([event.data], { type: 'audio/mpeg' });
+        const blob = new Blob([event.data], { type: 'audio/wav' });
         Audio_.enqueue(blob);
       }
     };

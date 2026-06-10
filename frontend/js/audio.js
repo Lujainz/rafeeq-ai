@@ -1,12 +1,18 @@
-// audio.js — recording and playback, completely separate from UI and socket
+// audio.js
 const Audio_ = (() => {
   let mediaRecorder, audioChunks, stream;
-
-  // ── Playback queue (promise chain) ──────────────────────────
   let playbackChain = Promise.resolve();
 
   function enqueue(blob) {
-    playbackChain = playbackChain.then(() => _play(blob));
+    playbackChain = playbackChain
+      .then(() => _play(blob))
+      .then(() => {
+        // when queue drains, check if nothing else is queued
+        if (playbackChain._settled !== false) {
+          UI.setIdle();
+          UI.setStatus('اضغط مع الاستمرار للتحدث');
+        }
+      });
   }
 
   function _play(blob) {
@@ -23,7 +29,6 @@ const Audio_ = (() => {
     playbackChain = Promise.resolve();
   }
 
-  // ── Recording ────────────────────────────────────────────────
   async function startRecording(onStop) {
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -43,12 +48,12 @@ const Audio_ = (() => {
     mediaRecorder.onstop = () => {
       const blob = new Blob(audioChunks, { type: 'audio/webm' });
       stream.getTracks().forEach(t => t.stop());
-      onStop(blob);   // hand the blob back to whoever called startRecording
+      onStop(blob);
     };
 
     mediaRecorder.start();
     UI.setMicRecording(true);
-    UI.setStatus('🎤 جاري الاستماع...');
+    UI.setStatus('جاري الاستماع...');
   }
 
   function stopRecording() {

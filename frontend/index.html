@@ -4,34 +4,67 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>رفيق</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 <body>
 
-  <h1>رفيق</h1>
-  <p class="subtitle">مساعدك الصوتي الذكي</p>
+  <div class="app">
 
-  <button id="mic-btn" title="اضغط واستمر للتحدث" disabled>
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 1a4 4 0 0 1 4 4v6a4 4 0 0 1-8 0V5a4 4 0 0 1 4-4zm-1
-               14.93V18H9v2h6v-2h-2v-2.07A7.001 7.001 0 0 0 19 11h-2a5
-               5 0 0 1-10 0H5a7.001 7.001 0 0 0 6 6.93z"/>
-    </svg>
-  </button>
+    <!-- Mic section — fixed height, always visible -->
+    <section class="mic-section">
 
-  <p id="status">جاري الاتصال...</p>
-  <p id="instruction">أفلت الزر لإرسال رسالتك</p>
+      <!-- waveform — appears above mic during speaking -->
+      <div class="waveform" id="waveform" aria-hidden="true">
+        <span class="wbar"></span>
+        <span class="wbar"></span>
+        <span class="wbar"></span>
+        <span class="wbar"></span>
+        <span class="wbar"></span>
+        <span class="wbar"></span>
+        <span class="wbar"></span>
+      </div>
 
-  <div class="bubble-container" id="bubbles"></div>
+      <!-- mic button with rings -->
+      <div class="mic-wrap" id="mic-wrap">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+        <button
+          id="mic-btn"
+          class="mic-btn"
+          disabled
+          aria-label="اضغط للتحدث"
+        >
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="9" y="2" width="6" height="12" rx="3" fill="white"/>
+            <path d="M5 11a7 7 0 0 0 14 0" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="12" y1="18" x2="12" y2="22" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+            <line x1="8.5" y1="22" x2="15.5" y2="22" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
 
-  <!-- load order matters: config → identity → ui → audio → socket → app -->
- <script src="/assets/js/config.js"></script>
-<script src="/assets/js/identity.js"></script>
-<script src="/assets/js/ui.js"></script>
-<script src="/assets/js/audio.js"></script>
-<script src="/assets/js/socket.js"></script>
+      <p id="status" class="status-text">جاري الاتصال...</p>
+
+    </section>
+
+    <!-- Chat section — takes remaining height, scrollable inside -->
+    <section class="chat-section">
+      <div class="chat-box" id="bubbles">
+        <!-- messages injected by ui.js -->
+      </div>
+    </section>
+
+  </div>
+
+  <script src="/assets/js/config.js"></script>
+  <script src="/assets/js/identity.js"></script>
+  <script src="/assets/js/ui.js"></script>
+  <script src="/assets/js/audio.js"></script>
+  <script src="/assets/js/socket.js"></script>
   <script>
-    // app.js — wires everything together, the only place modules touch each other
     Socket.connect();
 
     UI.micBtn.addEventListener('mousedown', onMicDown);
